@@ -22,7 +22,39 @@ resource "aws_lambda_function" "func1" {
 }
 
 # aws_cloudwatch_log_group to get the logs of the Lambda execution.
-resource "aws_cloudwatch_log_group" "lambda_log_group" {
+resource "aws_cloudwatch_log_group" "lambda1_log_group" {
  name              = "/aws/lambda/getTextFunction"
  retention_in_days = 14
+}
+
+# Create IAM role for getTextLambda funcition 
+resource "aws_iam_role" "lambda_exec_role" {
+ name = "getTextLambda_role"
+  assume_role_policy = jsonencode({
+   Version = "2012-10-17",
+   Statement = [
+     {
+       Action = "sts:AssumeRole",
+       Principal = {
+         Service = "lambda.amazonaws.com"
+       },
+       Effect = "Allow"
+     }
+   ]
+ })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
+ role       = aws_iam_role.lambda_exec_role.name
+ policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda1_S3_FullAccess" {
+ role       = aws_iam_role.lambda_exec_role.name
+ policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda1_textract_FullAccess" {
+ role       = aws_iam_role.lambda_exec_role.name
+ policy_arn = "arn:aws:iam::aws:policy/AmazonTextractFullAccess"
 }
