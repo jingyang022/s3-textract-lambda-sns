@@ -10,6 +10,12 @@ resource "aws_sns_topic_subscription" "sns-email-target" {
   endpoint  = "jingyang022@yahoo.com.sg"
 }
 
+resource "aws_sns_topic_subscription" "sns-trigger-lambda" {
+  topic_arn = aws_sns_topic.yap_topic.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.func2.arn
+}
+
 # Creating an IAM Role AWS SNS Access
 resource "aws_iam_role" "textract_exec_role" {
  name = "AWSSNSFullAccessRole"
